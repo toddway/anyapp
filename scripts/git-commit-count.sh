@@ -1,4 +1,3 @@
 #!/bin/bash
 
-output=$(git rev-list HEAD --count)
-echo $output
+echo $(git rev-list HEAD --count)

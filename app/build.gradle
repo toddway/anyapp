@@ -8,13 +8,32 @@ android {
         applicationId "com.toddway.anyapp"
         minSdkVersion 19
         targetSdkVersion 21
-        versionCode 1
-        versionName "1.0"
+        versionCode file("../scripts/git-commit-count.sh").toString().execute().text.trim().toInteger()
+        versionName file("../scripts/git-describe.sh").toString().execute().text.trim()
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    // Defines the APK filename
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            def apkPrefix = "anyapp-"
+            def apkSuffix = "-v${defaultConfig.versionName}-c${defaultConfig.versionCode}"
+            def originalApkFile = output.outputFile
+            output.outputFile = file(apkPrefix + originalApkFile.name.replace(".apk", "${apkSuffix}.apk"))
+
+            // print the APK path after assemble is done
+            output.assemble.doLast {
+                println output.outputFile
+            }
+
+//            if (variant.buildType.name.equals("release")) {
+//                project.tasks."publishApk${output.name.capitalize()}".apkFile = output.outputFile
+//            }
         }
     }
 }
