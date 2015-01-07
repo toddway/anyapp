@@ -21,7 +21,12 @@ public class MainActivity extends ActionBarActivity {
             TextView tv = (TextView) findViewById(R.id.title);
             tv.setText("Version " + pInfo.versionName);
             TextView tv2 = (TextView) findViewById(R.id.description);
-            tv2.setText(BuildConfig.BUILD_TIME + " - " + pInfo.versionCode);
+            if (BuildConfig.BUILD_TYPE.equals("release")) {
+                tv.setText("");
+            } else {
+                tv2.setText(BuildConfig.BUILD_TIME + " - " + BuildConfig.BUILD_TYPE + " - " + pInfo.versionCode);
+            }
+
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }

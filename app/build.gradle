@@ -2,6 +2,11 @@ import java.text.SimpleDateFormat
 
 apply plugin: 'com.android.application'
 
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:21.0.2'
+}
+
 android {
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
@@ -10,37 +15,54 @@ android {
         applicationId "com.toddway.anyapp"
         minSdkVersion 19
         targetSdkVersion 21
-        versionCode file("../scripts/git-commit-count.sh").toString().execute().text.trim().toInteger()
-        versionName file("../scripts/git-describe.sh").toString().execute().text.trim()
+        versionCode "git rev-list HEAD --count".execute().text.trim().toInteger()
+        versionName "git describe --dirty".execute().text.trim()
         buildConfigField "String", "BUILD_TIME", "\"${buildTime()}\""
     }
-    buildTypes {
+
+    signingConfigs {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            try {
+                storeFile file("app.keystore")
+                storePassword KEYSTORE_PASSWORD
+                keyAlias "client"
+                keyPassword KEY_PASSWORD
+            }
+            catch (ex) {
+                throw new InvalidUserDataException("You should define KEYSTORE_PASSWORD and " +
+                        "KEY_PASSWORD in gradle.properties."
+                )
+            }
         }
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+        }
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            proguardFiles 'proguard-rules.pro'
+            //proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
     }
 
     // override the APK filename to include version info
     applicationVariants.all { variant ->
         variant.outputs.each { output ->
-            def apkPrefix = "anyapp-${defaultConfig.versionName}-c${defaultConfig.versionCode}"
+            def apkPrefix = "build/anyapp-${defaultConfig.versionName}-${defaultConfig.versionCode}"
             def originalApkFile = output.outputFile
             output.outputFile = file(apkPrefix + "-" + originalApkFile.name)
         }
     }
 }
 
-dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:21.0.2'
-}
-
 def buildTime() {
     def df = new SimpleDateFormat("yyyy-MM-dd HH:mm z")
     return df.format(new Date())
 }
-
 
 def adb() {
     // Get location of adb
