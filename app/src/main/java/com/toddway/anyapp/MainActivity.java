@@ -18,8 +18,10 @@ public class MainActivity extends ActionBarActivity {
 
         try {
             PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            TextView tv = (TextView) findViewById(R.id.hello_world);
-            tv.setText(getString(R.string.app_name) + " " + pInfo.versionName + " (" + pInfo.versionCode + ")");
+            TextView tv = (TextView) findViewById(R.id.title);
+            tv.setText("Version " + pInfo.versionName);
+            TextView tv2 = (TextView) findViewById(R.id.description);
+            tv2.setText(BuildConfig.BUILD_TIME + " - " + pInfo.versionCode);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
