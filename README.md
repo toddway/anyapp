@@ -1,4 +1,4 @@
-This codebase demonstrates best practices for automating various parts of the build process for any mobile app.
+This codebase demonstrates some best practices for automating the Android build process.
 
 
 ## Build types
@@ -9,12 +9,14 @@ The debug build type
 is used by developers when writing new code.  It should be kept lean and fast - likely excluding
 steps like minification, automated tests, and static code analysis - since it will happen frequently.
 
-The beta build type is meant to be uploaded to a server where a team of beta testers can install it over-the-air.
-This project demonstrates this using the [Crashlytics Beta]() platform.  Ideally this build would
-be generated automatically by a Continuous Integration server.
+The beta build type is meant to be uploaded to a server where a team of beta testers can install the
+app over-the-air. We use [Crashlytics Beta]() for this.  Ideally this build type should initiated by
+an integration server - not a developer's local machine - and should include steps
+like minification, automated tests, and static code analysis.
 
 The release build type is meant to be published to the store for end users.  It includes additional
-store assets like app description and screenshots.
+store assets like app description and screenshots.  This should also be initiated by an
+integration server.
 
 
 ## Build versioning
@@ -42,17 +44,35 @@ These are useful to developers and beta testers during a project, but not to end
 are not displayed in release builds.
 
 
-## Build commands
-...
+## Private data
+Some parts of the build process require private data.  For example Crashlytics uses an apiSecret
+when uploading a new file and a signed Android app requires a keystore password and a key password.  If it
+is not safe to keep this data in the code repository, then use properties files that the build script
+can import.
 
-## Beta distribution
-...
+For example, since this codebase is publicly available on GitHub, the keystore password
+and key password are not included.  Instead an example gradle.properties file is included to show
+where passwords would be defined.
+
+
+## Build scripting
+Make the build script as universal and autonomous as possible.  Just like your app needs to work on
+different devices and for different scenarios, so does your build script (e.g. developer machines &
+integration servers). Ideally a single command should execute the entire build process.
+Use a config/properties file for any environment-dependant variables (e.g. sdk location).  If using
+software like Jenkins to execute integration jobs, keep the job configuration simple.
+Put the logic in the build script.  Consistency between integration server and developer machine
+will make troubleshooting much easier.
+
 
 ## Automated tests
 ...
 
-## Build publishing
+
+## Beta distribution
 ...
 
-## Keys/passwords
+
+## Store publishing
 ...
+
