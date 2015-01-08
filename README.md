@@ -1,5 +1,6 @@
 This codebase demonstrates some best practices for automating the Android build process.
 
+![Screenshot](web/Screenshot.png)
 
 ## Build types
 The build script defines three build types: debug, beta, and release
