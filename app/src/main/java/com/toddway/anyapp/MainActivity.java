@@ -8,12 +8,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
+
+import io.fabric.sdk.android.Fabric;
+
 
 public class MainActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_main);
 
         try {
@@ -22,7 +27,7 @@ public class MainActivity extends ActionBarActivity {
             tv.setText("Version " + pInfo.versionName);
             TextView tv2 = (TextView) findViewById(R.id.description);
             if (BuildConfig.BUILD_TYPE.equals("release")) {
-                tv.setText("");
+                tv2.setText("");
             } else {
                 tv2.setText(BuildConfig.BUILD_TIME + " - " + BuildConfig.BUILD_TYPE + " - " + pInfo.versionCode);
             }

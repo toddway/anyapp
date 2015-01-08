@@ -1,10 +1,33 @@
-import java.text.SimpleDateFormat
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+        jcenter()
+        mavenCentral()
+    }
 
+    dependencies {
+        classpath 'io.fabric.tools:gradle:1.+'
+        classpath 'com.novoda:gradle-android-command-plugin:1.3.0'
+        classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.+'
+    }
+}
+
+apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+apply plugin: 'android-command'
+
+repositories {
+    maven { url 'https://maven.fabric.io/public' }
+}
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:21.0.2'
+    compile('com.crashlytics.sdk.android:crashlytics:2.2.0@aar') {
+        transitive = true;
+    }
+
 }
 
 android {
@@ -40,11 +63,15 @@ android {
         debug {
             minifyEnabled false
         }
+        beta {
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            proguardFiles 'proguard-rules.pro'
+        }
         release {
             signingConfig signingConfigs.release
             minifyEnabled true
             proguardFiles 'proguard-rules.pro'
-            //proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
 
     }
@@ -59,35 +86,8 @@ android {
     }
 }
 
+import java.text.SimpleDateFormat
 def buildTime() {
     def df = new SimpleDateFormat("yyyy-MM-dd HH:mm z")
     return df.format(new Date())
-}
-
-def adb() {
-    // Get location of adb
-    Properties localProperties = new Properties()
-    try {
-        localProperties.load(project.rootProject.file('local.properties').newDataInputStream())
-    }
-    catch (ex) {
-        throw new InvalidUserDataException("You should define the path to your Android SDK as a " +
-                "property `sdk.dir` in local.properties on the project root."
-        )
-    }
-    return localProperties.getProperty('sdk.dir') + '/platform-tools/adb'
-}
-
-task runDebug(dependsOn: 'installDebug') {
-    description 'Runs the debug-flavour of the app on the connected device'
-    doLast {
-        exec{commandLine "${adb()}", "shell", "am", "start", "-n", "com.toddway.anyapp/.MainActivity"}
-    }
-}
-
-task runRelease(dependsOn: 'installRelease') {
-    description 'Runs the release-flavour of the app on the connected device'
-    doLast {
-        exec{commandLine "${adb()}", "shell", "am", "start", "-n", "com.toddway.anyapp/.MainActivity"}
-    }
 }

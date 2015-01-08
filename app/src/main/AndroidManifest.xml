@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.toddway.anyapp" >
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -16,6 +18,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <meta-data android:name="com.crashlytics.ApiKey" android:value="3b161eefc422c185e5cdd85e8d059c16d813c551"/>
     </application>
 
 </manifest>
